@@ -1,9 +1,13 @@
 PDF to Audiobook Converter
+-
 
 Overview:
+-
   The PDF to Audiobook Converter is a Python-based web application designed to assist users in consuming written content through audio. By         leveraging text-to-speech (TTS) technologies, this tool converts standard PDF documents into downloadable audio files (MP3 or M4A). The          application features an intelligent operating system detection system that optimizes the audio generation process based on whether the host      machine is running macOS or Windows.
 
 Features:
+-
+ 
   -Web-Based Interface: Simple, user-friendly drag-and-drop interface built with HTML and CSS.
 
   -Smart OS Detection:
@@ -16,6 +20,7 @@ Features:
 
 
 Technologies & Tools Used:
+-
 
   Language: Python 3.x
 
@@ -31,17 +36,14 @@ Technologies & Tools Used:
 
 
 Steps to Install & Run:
+-
 
   Prerequisites:
   Ensure you have Python 3 installed on your system.
 
   Installation:
   Clone the repository to your local machine:
-
-  git clone <your-repository-url>
-  cd <your-repository-folder>
-
-
+  
   Install the required Python dependencies:
   pip install flask PyPDF2 pyttsx3
 
@@ -57,6 +59,8 @@ Steps to Install & Run:
 
 
 Instructions for Testing:
+-
+  
   Prepare a PDF: Locate a PDF file containing selectable text (scanned images without OCR will not work).
 
   Upload: On the homepage, click "Choose File" and select your PDF.
