@@ -3,54 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF to Audio Converter</title>
+    <title>PDF to Audio | Auralize</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #2d3748;
+            --accent-color: #5a67d8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
+            font-family: 'Poppins', sans-serif;
+            background: var(--primary-gradient);
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            overflow: hidden;
+            position: relative;
         }
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            text-align: center;
+
+        /* Decorative background shapes */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+        }
+        .shape-1 {
+            background: #43e97b;
+            width: 300px;
+            height: 300px;
+            top: -50px;
+            left: -50px;
+            opacity: 0.4;
+        }
+        .shape-2 {
+            background: #fa709a;
             width: 350px;
+            height: 350px;
+            bottom: -80px;
+            right: -80px;
+            opacity: 0.4;
         }
-        h1 { color: #333; font-size: 1.5rem; margin-bottom: 1rem; }
-        input[type="file"] { margin-bottom: 1rem; }
-        button {
-            background-color: #007AFF; /* Mac Blue */
+
+        .container {
+            background: var(--glass-bg);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        h1 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        p.subtitle {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Custom File Upload Area */
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 16px;
+            padding: 2rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: #f7fafc;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--accent-color);
+            background: #ebf4ff;
+        }
+
+        .upload-area i {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+        
+        .file-name {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Button */
+        .btn-convert {
+            background: var(--primary-gradient);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 1rem 2rem;
+            border-radius: 12px;
             font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
+            margin-top: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
-        button:hover { background-color: #0056b3; }
-        .note { font-size: 0.8rem; color: #666; margin-top: 1rem; }
+
+        .btn-convert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+        }
+
+        .btn-convert:active {
+            transform: translateY(0);
+        }
+
+        /* Loading State */
+        .loader {
+            display: none;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: #a0aec0;
+        }
     </style>
 </head>
 <body>
 
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
     <div class="container">
-        <h1>📄 PDF to 🎧 Audio</h1>
+        <h1>PDF Audio Reader</h1>
+        <p class="subtitle">Transform your documents into speech</p>
         
-        <form action="/convert" method="post" enctype="multipart/form-data">
-            <input type="file" name="pdf_file" accept=".pdf" required>
-            <br><br>
-            <button type="submit">Convert & Download</button>
+        <form action="/convert" method="post" enctype="multipart/form-data" id="convertForm">
+            
+            <div class="upload-area" id="dropZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="upload-text">Drag & Drop PDF here <br> or <span>Browse</span></div>
+                <span class="file-name" id="fileName"></span>
+                <input type="file" name="pdf_file" accept=".pdf" id="fileInput" required>
+            </div>
+
+            <button type="submit" class="btn-convert" id="submitBtn">
+                <span class="btn-text">Convert to Audio</span>
+                <div class="loader"></div>
+            </button>
+
         </form>
 
-        <p class="note">Powered by Python</p>
+        <div class="footer">
+            Runs locally on Python • secure & private
+        </div>
     </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const dropZone = document.getElementById('dropZone');
+        const form = document.getElementById('convertForm');
+        const btn = document.getElementById('submitBtn');
+        const btnText = document.querySelector('.btn-text');
+        const loader = document.querySelector('.loader');
+
+        // Update filename when file is selected
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                fileNameDisplay.textContent = "Selected: " + this.files[0].name;
+                dropZone.style.borderColor = "#5a67d8";
+                dropZone.style.background = "#ebf4ff";
+            }
+        });
+
+        // Drag and Drop Visual Effects
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            fileInput.files = e.dataTransfer.files;
+            // Trigger change event manually
+            const event = new Event('change');
+            fileInput.dispatchEvent(event);
+        });
+
+        // Loading State on Submit
+        form.addEventListener('submit', function() {
+            // Prevent double submission visual
+            if (fileInput.files.length === 0) return;
+
+            btnText.textContent = "Processing...";
+            loader.style.display = "block";
+            btn.style.opacity = "0.8";
+            btn.style.cursor = "wait";
+        });
+    </script>
 
 </body>
 </html>
